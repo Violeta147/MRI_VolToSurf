@@ -4,8 +4,8 @@
 ### The greater the standard deviation with respect to the mean the more they are likely to be non-BOLD signal voxels.
 ### Mandatory input positional arguments are:
 ### 	- DataFolder: Directory where the fmri image is stored
-### 	- OutFolder: Directory where the pipeline temporal files are to be stored
-###	- NeighborhoodSmoothing: Sigma of the kernel for smoothing the cov image
+### 	- OutFolder: Directory where the output files are to be stored
+###	    - NeighborhoodSmoothing: Sigma of the kernel for smoothing the cov image
 
 DataFolder=$1
 OutFolder=$2
