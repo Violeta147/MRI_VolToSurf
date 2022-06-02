@@ -1,6 +1,18 @@
 #!/bin/bash
 
 
+### This script performs the transformation of the volumetric fMRI data to a CIFTI file containing the cortex fMRI in surface space and the subcortical data in volumetric space.
+### Mandatory input positional arguments are:
+### 	- Subject: Subject ID
+### 	- Session: SessionID
+###	- Working Directory: Directory conatining the input images
+###	- FWHM: 
+### Optional flags and their input arguments are:
+###	-f --freesurfer-dir <FS_DIR> : Full path to the subject's freesurfer directory
+###	-s --subcortical-mask <subc> : Full path to subcortical mask in native anatomical space
+###	-r --reference-image <RefImg> : 
+###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask) are stored
+
 ### PARSE ARGUMENTS
 #
 # Positional arguments: SubjectId, Session, Work_dir and FWHM
@@ -15,7 +27,7 @@ while (( "$#" )) ; do
   case "$1" in
     -r|--reference-image)
       if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
-	      useRefImg=1
+	useRefImg=1
         RefImg=$2
         shift 2
       else

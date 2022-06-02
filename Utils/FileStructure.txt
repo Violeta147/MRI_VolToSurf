@@ -1,0 +1,35 @@
+File structure for Volume2Surface pipeline:
+
+- Folder with one subfolder per subject:
+	- preproc_rest.nii.gz (preprocessed fmri in native space)
+	- func2anat.mat (transformation matrix from functional to anatomical native spaces)
+	* func2temp.nii.gz (warp from functional to template space (includes affine)). Only necessary if performing normalization and will be created in case it does not exist.
+	* subcortical-structures.txt (file with subcortical information for creating label)
+   - If using -s/--subcortical-mask flag:
+	- subc.nii.gz (binary volumetric mask with 1 in subcortical structures and 0 otherwise, in anatomical native space)
+   - If not using Freesurfer:
+	- hemi-left_pial.surf.gii (left pial surface)
+	- hemi-left_white.surf.gii (left white matter surface)
+	- hemi-left_midthickness.surf.gii (left midthickness surface)
+	+ hemi-left_sphere.surf.gii (left sphere surface). Only if doing normalization
+	- hemi-left_medialwall.shape.gii (left nonmedialwall surface roi)
+	+ hemi-left_from-native_to-dhcpSym40_dens-32k_mode-sphere.surf.gii (right surface warp from native to tamplate surface). Only if doing normalization
+	- hemi-right_pial.surf.gii (right pial surface)
+	- hemi-right_white.surf.gii (right white matter surface)
+	- hemi-right_midthickness.surf.gii (right midthickness surface)
+	+ hemi-right_sphere.surf.gii (right sphere surface). Only if doing normalization.
+	- hemi-right_medialwall.shape.gii (right nonmedialwall surface roi)
+	+ hemi-right_from-native_to-dhcpSym40_dens-32k_mode-sphere.surf.gii (right surface warp from native to tamplate surface)
+
+# Folder with one subfolder per subject containing its Freesurfer output (if using Freesurfer flag)
+
++ Folder of the Surface Template provided by dHCP (only if normalizing)
+
++ Folder with Volumetric Template data (only if normalizing):
+	+ subcortical_mask.nii.gz (like the native subcortical mask but from the template)
+	+ Template.nii.gz (template anatomical image)
+
+
+
+
+Legend: - Mandatory files with no flags    * Optional files that will be automatically created if they do not exist    + Mandatory files if performing normalization     # Mandatory files if using Fresurfer

@@ -63,6 +63,7 @@ wb_command -metric-mask  "${DataFolder}"/preproc_rest."${hemi}".native.func.gii\
 	"${DataFolder}"/hemi-"${hemi}"_medialwall.shape.gii  "${DataFolder}"/preproc_rest."${hemi}".native.func.gii
 
 
+##### NOT IMPLEMENTED
 if [ ${normalize} -eq 1 ]; then
 
  wb_command -metric-resample "${OutFolder}"/"${hemi}".goodvoxels.native.func.gii\
@@ -92,3 +93,4 @@ if [ ${normalize} -eq 1 ]; then
 	"${OutFolder}"/"${hemi}".preproc_rest.dhcpSym40_32k.func.gii
 
 fi
+##### END OF NOT IMPLEMENTED

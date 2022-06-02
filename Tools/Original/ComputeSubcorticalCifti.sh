@@ -7,7 +7,7 @@
 ### Optional flags and their input arguments are:
 ###	-f --freesurfer-dir <FS_DIR> : Full path to the subject's freesurfer directory
 ###	-s --subcortical-mask <subc> : Full path to subcortical mask in native anatomical space
-###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask)
+###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask) are stored
 
 useFreesurfer=0
 
@@ -113,7 +113,8 @@ wb_command -cifti-separate "${OutFolder}"/func_temp_subject_dilate.dtseries.nii 
 #rm -f ${ResultsFolder}/func_temp_subject.dtseries.nii
 
 
-if [[ ${normalize} -eq 1 ]]; then
+##### NOT IMPLEMENTED
+if [[ ${normalize} -eq 1 ]]; then   
  echo "Generate atlas subcortical template cifti"
  wb_command -cifti-create-label "${OutFolder}"/subcortical_mask.dlabel.nii -volume "${Temp_dir}"/subcortical_mask.nii.gz "${Temp_dir}"/subcortical_mask.nii.gz
 
@@ -139,3 +140,4 @@ if [[ ${normalize} -eq 1 ]]; then
 #rm -f ${func_space_dir}/func_space-func.dtseries.nii
 #rm -f ${template_space_dir}/func_space-extdhcp40wk.dtseries.nii
 fi
+##### END OF NOT IMPLEMENTED
