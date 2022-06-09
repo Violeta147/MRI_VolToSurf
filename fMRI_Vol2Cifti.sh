@@ -16,6 +16,7 @@
 ### PARSE ARGUMENTS
 #
 # Positional arguments: SubjectId, Session, Work_dir and FWHM
+# Test
 
 useRefImg=0
 useFreesurfer=0
@@ -94,6 +95,12 @@ cd /home/lmarcos/Escritorio/Pipeline_Vol2Surf/ || exit
 mkdir "${Work_dir}"/"${Subject}"/tmp
 
 # Compute mean fMRI
+
+# Work_dir1=/media/BabyBrain/preterm/fMRI_Vol2Cifti
+# Work_dir2=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline
+# Subject=sub-CC00063AN06
+# Ses=ses-15102
+
 if ! [ -f "${Work_dir}"/"${Subject}"/tmp/mean.nii.gz ]; then
  fslmaths "${Work_dir}"/"${Subject}"/preproc_rest.nii.gz -Tmean "${Work_dir}"/"${Subject}"/tmp/mean.nii.gz -odt float
 fi
