@@ -187,7 +187,7 @@ if ! [ -f  "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"
      GreyRibbonValue=${RightGreyRibbonValue}
    fi
    
-   bash Tools/Original/ComputeRibbon.sh "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp "${RefImg}" "${hemi}" "${GreyRibbonValue}"
+   bash Tools/BIDS/ComputeRibbon.sh "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp "${RefImg}" "${hemi}" "${GreyRibbonValue}"
 
   done
 
@@ -216,7 +216,7 @@ fi
 
 if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_goodvoxels.nii.gz ]; then
  echo "Computing goodvoxels image"
- bash Tools/Original/ComputeGoodvoxels.sh "${Work_dir}"/fMRI_Vol2Cifti"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp ${NeighborhoodSmoothing}
+ bash Tools/BIDS/ComputeGoodvoxels.sh "${Work_dir}"/fMRI_Vol2Cifti"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp ${NeighborhoodSmoothing}
 else
  echo "Goodvoxels image already computed"
 fi 
@@ -240,7 +240,7 @@ for hemi in L R ; do
 
   if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii ]; then
    echo "Mapping ${hemi} cortical maps to surface"
-   bash Tools/Original/fMRI2Surf.sh "${Work_dir}"/fMRI_Vol2Cifti"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp "${hemi}"
+   bash Tools/BIDS/fMRI2Surf.sh "${Work_dir}"/fMRI_Vol2Cifti"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp "${hemi}"
   else
    echo "${hemi} cortical surface maps already computed"
   fi 
@@ -303,7 +303,7 @@ else
  echo "Creating Subcortical Cifti"
 
   if [ ${useSubc} -eq 1 ]; then
-   bash Tools/Original/ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp -s "${Subc}"
+   bash Tools/BIDS/ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp -s "${Subc}"
   elif [ ${useFreesurfer} -eq 1 ]; then
    bash ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp -f "${FS_DIR}"
   else
@@ -328,7 +328,7 @@ TR_vol=$(fslval "${Work_dir}"/"${Subject}"/preproc_rest.nii.gz pixdim4 | cut -d 
 if [ ${normalize} -eq 1 ]; then
  bash CreateCompleteCifti.sh "${Work_dir}"/"${Subject}" "${Work_dir}"/"${Subject}"/tmp "${TR_vol}" "${FWHM}" -n "${SurfTemp_dir}"
 else
- bash Tools/Original/CreateCompleteCifti.sh "${Work_dir}"/"${Subject}" "${Work_dir}/${Subject}/tmp" "${TR_vol}" "${FWHM}"
+ bash Tools/BIDS/CreateCompleteCifti.sh "${Work_dir}"/"${Subject}" "${Work_dir}/${Subject}/tmp" "${TR_vol}" "${FWHM}"
 fi
 
 
