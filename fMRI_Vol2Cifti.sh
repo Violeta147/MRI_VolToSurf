@@ -92,8 +92,8 @@ cd /home/vsanchez/Pipeline_Vol2Surf/ || exit
 # Create temporal folder (in Preterm)
 
 # Work_dir=/media/BabyBrain/preterm
-# Subject=sub-CC00124XX09
-# Ses=ses-42302
+# Subject=sub-CC00135AN12
+# Ses=ses-44900
 
 # 1:
 # mkdir "${Work_dir}"/fMRI_Vol2Cifti
@@ -178,7 +178,7 @@ if ! [ -f  "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"
  echo "Computing Ribbon Image"
  
  if [[ "${useFreesurfer}" -eq 1 ]] ; then
-  for hemi in left right;
+  for hemi in L R;
   do
 
    if [ $hemi = "left" ] ; then
@@ -187,7 +187,7 @@ if ! [ -f  "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"
      GreyRibbonValue=${RightGreyRibbonValue}
    fi
    
-   bash Tools/BIDS/ComputeRibbon.sh "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp "${RefImg}" "${hemi}" "${GreyRibbonValue}"
+   bash Tools/BIDS/ComputeRibbon.sh "${AnatFolder}" "${OutFolder}" "${Subject}" "${Ses}" "${RefImg}" "${hemi}" "${GreyRibbonValue}"
 
   done
 
@@ -216,14 +216,15 @@ fi
 
 if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_goodvoxels.nii.gz ]; then
  echo "Computing goodvoxels image"
- bash Tools/BIDS/ComputeGoodvoxels.sh "${Work_dir}"/fMRI_Vol2Cifti"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp ${NeighborhoodSmoothing}
+ #bash Tools/BIDS/ComputeGoodvoxels.sh "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp ${NeighborhoodSmoothing}
+ bash Tools/BIDS/ComputeGoodvoxels.sh "${fmriFolder}" "${OutFolder}" "${Subject}" "${Ses}" "${NeighborhoodSmoothing}"
 else
  echo "Goodvoxels image already computed"
 fi 
 
 
 
-# Mapping cortical maps to surface --> REVISAR
+# Mapping cortical maps to surface
 
 for hemi in L R ; do
 
@@ -240,7 +241,7 @@ for hemi in L R ; do
 
   if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii ]; then
    echo "Mapping ${hemi} cortical maps to surface"
-   bash Tools/BIDS/fMRI2Surf.sh "${Work_dir}"/fMRI_Vol2Cifti"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp "${hemi}"
+   bash Tools/BIDS/fMRI2Surf.sh "${AnatFolder}" "${fmriFolder}" "${OutFolder}" "${Subject}" "${Ses}" "${hemi}"
   else
    echo "${hemi} cortical surface maps already computed"
   fi 
