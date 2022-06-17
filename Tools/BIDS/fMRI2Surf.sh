@@ -8,6 +8,22 @@
 ### Optional flags and their input arguments are:
 ###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask)
 
+
+AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
+fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
+OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp
+AnatFolder=$1
+fmriFolder=$2
+OutFolder=$3
+Subject=$4
+Ses=$5
+hemi=$6
+
+# Check data:
+echo "AnatFolder:" "${AnatFolder}"
+echo "fmriFolder:" "${fmriFolder}"
+echo "OutFolder:" "${OutFolder}"
+
 normalize=0
 
 PARAMS=""
@@ -36,28 +52,21 @@ done
 
 eval set -- "$PARAMS"
 
-DataFolder=$1
-OutFolder=$2
-hemi=$3
-
-# DataFolder=/media/BabyBrain/preterm
-# OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti
-
 if ! [ -f "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_"${hemi}".goodvoxels.native.func.gii ] ; then
 
- wb_command -volume-to-surface-mapping "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_goodvoxels.nii.gz "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_"${hemi}".goodvoxels.native.func.gii -ribbon-constrained "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_wm.surf.gii "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_pial.surf.gii
+ wb_command -volume-to-surface-mapping "${OutFolder}"/"${Subject}"_"${Ses}"_goodvoxels.nii.gz "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii "${OutFolder}"/"${Subject}"_"${Ses}"_"${hemi}".goodvoxels.native.func.gii -ribbon-constrained "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_wm.surf.gii "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_pial.surf.gii
 
- wb_command -metric-mask "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_"${hemi}".goodvoxels.native.func.gii "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_desc-medialwall_mask.shape.gii "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_"${hemi}".goodvoxels.native.func.gii
+ wb_command -metric-mask "${OutFolder}"/"${Subject}"_"${Ses}"_"${hemi}".goodvoxels.native.func.gii "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_desc-medialwall_mask.shape.gii "${OutFolder}"/"${Subject}"_"${Ses}"_"${hemi}".goodvoxels.native.func.gii
 
 fi
 
-wb_command -volume-to-surface-mapping "${DataFolder}"/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func/"${Subject}"_"${Ses}"_task-rest_desc-preproc_bold.nii.gz "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii -ribbon-constrained "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_wm.surf.gii "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_pial.surf.gii -volume-roi "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_goodvoxels.nii.gz
+wb_command -volume-to-surface-mapping "${fmriFolder}"/"${Subject}"_"${Ses}"_task-rest_desc-preproc_bold.nii.gz "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii "${OutFolder}"/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii -ribbon-constrained "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_wm.surf.gii "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_pial.surf.gii -volume-roi "${OutFolder}"/"${Subject}"_"${Ses}"_goodvoxels.nii.gz
 
-wb_command -metric-dilate "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii 10 "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii -nearest
+wb_command -metric-dilate "${OutFolder}"/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii 10 "${OutFolder}"/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii -nearest
 
-wb_command -metric-mask  "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii "${DataFolder}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_desc-medialwall_mask.shape.gii  "${OutFolder}"/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii
+wb_command -metric-mask  "${OutFolder}"/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_desc-medialwall_mask.shape.gii  "${OutFolder}"/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii
 
-
+: '
 ##### NOT IMPLEMENTED
 if [ ${normalize} -eq 1 ]; then
 
@@ -89,3 +98,4 @@ if [ ${normalize} -eq 1 ]; then
 
 fi
 ##### END OF NOT IMPLEMENTED
+'
