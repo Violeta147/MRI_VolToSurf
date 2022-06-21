@@ -60,8 +60,8 @@ else
   
  echo "Extract Subcortical voxels from T1"
  # Extract subcortical voxels (to be implemented)
- #T1=${AnatFolder}/"${Subject}"_"${Ses}"_desc-restore_space-T2w_T1w.nii.gz
- T1=${AnatFolder}/T1.nii.gz
- run_first_all -i "${T1}" -o "${OutFolder}"/"${Subject}"_"${Ses}"_subc.nii.gz
+ T1=${AnatFolder}/"${Subject}"_"${Ses}"_desc-restore_T2w.nii.gz
+ echo "T1:" "${T1}"
+ run_first_all -i "${T1}" -o "${OutFolder}"/"${Subject}"_"${Ses}"_subc
 
 fi
