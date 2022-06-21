@@ -91,32 +91,34 @@ cd /home/vsanchez/Pipeline_Vol2Surf/ || exit
 
 # Create temporal folder (in Preterm)
 
-# Work_dir=/media/BabyBrain/preterm
-# Subject=sub-CC00135AN12
-# Ses=ses-44900
+Work_dir=/media/BabyBrain/preterm
+Subject=sub-CC00135BN12
+Ses=ses-44704
+OutDir=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
+echo "Work_dir:" "${Work_dir}"
+echo "OutDir:" "${OutDir}"
 
 # 1:
 # mkdir "${Work_dir}"/fMRI_Vol2Cifti
 
 # 2:
-mkdir "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
-
-# 3:
-# Quitar???
-mkdir "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp
+mkdir "${OutDir}"
 
 
 # Compute mean fMRI
 
-if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_mean.nii.gz ]; then
- fslmaths "${Work_dir}"/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func/"${Subject}"_"${Ses}"_task-rest_desc-preproc_bold.nii.gz -Tmean "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_mean.nii.gz -odt float
+if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_mean.nii.gz ]; then
+ fslmaths "${Work_dir}"/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func/"${Subject}"_"${Ses}"_task-rest_desc-preproc_bold.nii.gz -Tmean "${OutDir}"/"${Subject}"_"${Ses}"_mean.nii.gz -odt float
+
+else
+ echo "This file already exists"
 fi
 
 
 if [[ $useRefImg -eq 1 ]]; then
 
  # Check FMRI and SBref shape
- ShapeFMRI=$(mrinfo -size "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_mean.nii.gz)
+ ShapeFMRI=$(mrinfo -size "${OutDir}"/"${Subject}"_"${Ses}"_mean.nii.gz)
  IFS=' ' read -r -a ShapeFMRI <<< "$ShapeFMRI"
  ShapeSBRef=$(mrinfo -size "${RefImg}")
  IFS=' ' read -r -a ShapeSBRef <<< "$ShapeSBRef"
@@ -124,13 +126,13 @@ if [[ $useRefImg -eq 1 ]]; then
 
  if [ -n "$DIFF" ];then
   echo 'SBRef and fMRI images have different dimensions, computing linear registration'
-  flirt -in "${RefImg}" -ref "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_mean.nii.gz -omat "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/SBRef2fMRI.mat -out "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/SBRef_fMRI.nii.gz
-  RefImg="${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"/tmp/SBRef_fMRI.nii.gz
+  flirt -in "${RefImg}" -ref "${OutDir}"/"${Subject}"_"${Ses}"_mean.nii.gz -omat "${OutDir}"/SBRef2fMRI.mat -out "${OutDir}"/SBRef_fMRI.nii.gz
+  RefImg="${OutDir}"/SBRef_fMRI.nii.gz
  fi
 
 else
  
- RefImg="${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_mean.nii.gz
+ RefImg="${OutDir}"/"${Subject}"_"${Ses}"_mean.nii.gz
 
 fi
 echo "${RefImg}"
@@ -138,9 +140,9 @@ echo "${RefImg}"
 
 # Check if anat2func transformation matrix exist or compute it otherwise
 
-if ! [ -f "${Work_dir}"/rel3_dhcp_dmri_shard_pipeline/"${Subject}"/"${Ses}"/xfm/"${Subject}"_"${Ses}"_from-T2w_to-dwi_mode-image.mat ] ; then
+if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_from-T2w_to-bold_mode-image.mat ] ; then
  echo "Dame la inversa papá"
- convert_xfm -omat "${Work_dir}"/rel3_dhcp_dmri_shard_pipeline/"${Subject}"/"${Ses}"/xfm/"${Subject}"_"${Ses}"_from-T2w_to-dwi_mode-image.mat -inverse "${Work_dir}"/rel3_dhcp_dmri_shard_pipeline/"${Subject}"/"${Ses}"/xfm/"${Subject}"_"${Ses}"_from-dwi_to-T2w_mode-image.mat
+ flirt -in "${Work_dir}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_desc-restore_T2w.nii.gz -ref "${RefImg}" -cost normmi -omat "${OutDir}"/"${Subject}"_"${Ses}"_from-T2w_to-bold_mode-image.mat
 
 else
  echo "The inverse already exists"
@@ -174,16 +176,16 @@ RightGreyRibbonValue="1"
 
 ### CREATE RIBBON ###
 
-if ! [ -f  "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_ribbon_only.nii.gz ]; then
+if ! [ -f  "${OutDir}"/"${Subject}"_"${Ses}"_ribbon_only.nii.gz ]; then
  echo "Computing Ribbon Image"
  
- if [[ "${useFreesurfer}" -eq 1 ]] ; then
+ if [[ "${useFreesurfer}" -eq 0 ]] ; then
   for hemi in L R;
   do
 
-   if [ $hemi = "left" ] ; then
+   if [ $hemi = "L" ] ; then
      GreyRibbonValue=${LeftGreyRibbonValue}
-   elif [ $hemi = "right" ] ; then
+   elif [ $hemi = "R" ] ; then
      GreyRibbonValue=${RightGreyRibbonValue}
    fi
    
@@ -194,15 +196,15 @@ if ! [ -f  "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"
  else
  
   # Transform freesurfer ribbon to nifti and remove wm
-  mri_convert "${FS_DIR}"/"${Subject}"/mri/ribbon.mgz "${Work_dir}"/"${Subject}"/tmp/ribbon.nii.gz
-  fslreorient2std "${Work_dir}"/"${Subject}"/tmp/ribbon.nii.gz "${Work_dir}"/"${Subject}"/tmp/ribbon.nii.gz
-  fslmaths "${Work_dir}"/"${Subject}"/tmp/ribbon.nii.gz -uthr 3 -thr 3 -bin "${Work_dir}"/"${Subject}"/tmp/left.ribbon.nii.gz
-  fslmaths "${Work_dir}"/"${Subject}"/tmp/ribbon.nii.gz -uthr 42 -thr 42 -bin "${Work_dir}"/"${Subject}"/tmp/right.ribbon.nii.gz
+  mri_convert "${FS_DIR}"/"${Subject}"/mri/ribbon.mgz "${OutDir}"/ribbon.nii.gz
+  fslreorient2std "${OutDir}"/ribbon.nii.gz "${OutDir}"/ribbon.nii.gz
+  fslmaths "${OutDir}"/ribbon.nii.gz -uthr 3 -thr 3 -bin "${OutDir}"/left.ribbon.nii.gz
+  fslmaths "${OutDir}"/ribbon.nii.gz -uthr 42 -thr 42 -bin "${OutDir}"/right.ribbon.nii.gz
  fi
 
  # Merge Ribbon Hemispheres
- fslmaths "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_L.ribbon.nii.gz -add "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_R.ribbon.nii.gz "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_ribbon_only.nii.gz
- rm "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_L.ribbon.nii.gz "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_R.ribbon.nii.gz
+ fslmaths "${OutDir}"/"${Subject}"_"${Ses}"_L.ribbon.nii.gz -add "${OutDir}"/"${Subject}"_"${Ses}"_R.ribbon.nii.gz "${OutDir}"/"${Subject}"_"${Ses}"_ribbon_only.nii.gz
+ rm "${OutDir}"/"${Subject}"_"${Ses}"_L.ribbon.nii.gz "${OutDir}"/"${Subject}"_"${Ses}"_R.ribbon.nii.gz
 
 else
 
@@ -214,13 +216,12 @@ fi
 
 # Create mask of voxels with good signal
 
-if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_goodvoxels.nii.gz ]; then
+if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_goodvoxels.nii.gz ]; then
  echo "Computing goodvoxels image"
- #bash Tools/BIDS/ComputeGoodvoxels.sh "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp ${NeighborhoodSmoothing}
  bash Tools/BIDS/ComputeGoodvoxels.sh "${fmriFolder}" "${OutFolder}" "${Subject}" "${Ses}" "${NeighborhoodSmoothing}"
 else
  echo "Goodvoxels image already computed"
-fi 
+fi
 
 
 
@@ -230,16 +231,16 @@ for hemi in L R ; do
 
  if [ ${normalize} -eq 1 ]; then
 
-  if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_"${hemi}".preproc_rest.dhcpSym40_32k.func.gii ]; then
+  if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_"${hemi}".preproc_rest.dhcpSym40_32k.func.gii ]; then
    echo "Mapping ${hemi} cortical maps to surface and resampling to template surface"
-   bash fMRI2Surf.sh "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp "${hemi}" -n "${SurfTemp_dir}"
+   bash fMRI2Surf.sh "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}" "${OutDir}" "${hemi}" -n "${SurfTemp_dir}"
   else
    echo "Normalized ${hemi} cortical surface maps already computed and normalized"
   fi
 
  else
 
-  if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii ]; then
+  if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii ]; then
    echo "Mapping ${hemi} cortical maps to surface"
    bash Tools/BIDS/fMRI2Surf.sh "${AnatFolder}" "${fmriFolder}" "${OutFolder}" "${Subject}" "${Ses}" "${hemi}"
   else
@@ -254,15 +255,15 @@ done
 
 ### SURFACE SMOOTHING
 
-# FWHM=6
+FWHM="6"
 
-if ! [ -f "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest_s"${FWHM}".atlasroi."${hemi}".native.func.gii ]; then
+if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_preproc_rest_s"${FWHM}".atlasroi."${hemi}".native.func.gii ]; then
  echo "Smoothing fMRI cortical surface"
 
  Sigma=$(echo "$FWHM / ( 2 * ( sqrt ( 2 * l ( 2 ) ) ) )" | bc -l) # (standard_in) 1: syntax error
 
  for hemi in L R ; do
-  wb_command -metric-smoothing "${Work_dir}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii "${Sigma}" "${Work_dir}"/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp/"${Subject}"_"${Ses}"_preproc_rest_s"${FWHM}".atlasroi."${hemi}".native.func.gii -roi "${Work_dir}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_desc-medialwall_mask.shape.gii
+  wb_command -metric-smoothing "${Work_dir}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_midthickness.surf.gii "${OutDir}"/"${Subject}"_"${Ses}"_preproc_rest."${hemi}".native.func.gii "${Sigma}" "${OutDir}"/"${Subject}"_"${Ses}"_preproc_rest_s"${FWHM}".atlasroi."${hemi}".native.func.gii -roi "${Work_dir}"/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat/"${Subject}"_"${Ses}"_hemi-"${hemi}"_desc-medialwall_mask.shape.gii
  done
 
 else
@@ -275,11 +276,10 @@ fi
 
 ### SUBCORTICAL PROCESSING
 
-# Work_dir=/media/BabyBrain/preterm/fMRI_Vol2Cifti
 
 if [ ${normalize} -eq 1 ]; then
 
- if ! [ -f "${Work_dir}"/"${Subject}"/tmp/subcortical_space-extdhcp40wk.nii.gz ]; then
+ if ! [ -f "${OutDir}"/subcortical_space-extdhcp40wk.nii.gz ]; then
 
   echo "Creating Subcortical Cifti" 
  
@@ -299,16 +299,16 @@ if [ ${normalize} -eq 1 ]; then
 
 else
  
- if ! [ -f "${Work_dir}/"${Subject}"_"${Ses}"/tmp/subcortical_fmri.nii.gz" ]; then
+ if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_subcortical_fmri.nii.gz ]; then
 
  echo "Creating Subcortical Cifti"
 
   if [ ${useSubc} -eq 1 ]; then
-   bash Tools/BIDS/ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp -s "${Subc}"
+   bash Tools/BIDS/ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${OutDir}" -s "${Subc}"
   elif [ ${useFreesurfer} -eq 1 ]; then
-   bash ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp -f "${FS_DIR}"
+   bash ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${OutDir}" -f "${FS_DIR}"
   else
-   bash ComputeSubcorticalCifti.sh "${Work_dir}"/"${Subject}"_"${Ses}" "${Work_dir}"/"${Subject}"_"${Ses}"/tmp
+   bash Tools/BIDS/ComputeSubcorticalCifti.sh "${AnatFolder}" "${fmriFolder}" "${OutFolder}" "${Subject}" "${Ses}"
   fi
 
  else
@@ -324,15 +324,10 @@ fi
 ### CREATE DENSE TIMESERIES
 echo "Creating Complete Cifti"
 
-TR_vol=$(fslval "${Work_dir}"/"${Subject}"/preproc_rest.nii.gz pixdim4 | cut -d " " -f 1)
+TR_vol=$(fslval "${Work_dir}"/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func/"${Subject}"_"${Ses}"_task-rest_desc-preproc_bold.nii.gz pixdim4 | cut -d " " -f 1)
 
 if [ ${normalize} -eq 1 ]; then
- bash CreateCompleteCifti.sh "${Work_dir}"/"${Subject}" "${Work_dir}"/"${Subject}"/tmp "${TR_vol}" "${FWHM}" -n "${SurfTemp_dir}"
+ bash CreateCompleteCifti.sh "${OutDir}" "${TR_vol}" "${FWHM}" -n "${SurfTemp_dir}"
 else
- bash Tools/BIDS/CreateCompleteCifti.sh "${Work_dir}"/"${Subject}" "${Work_dir}/${Subject}/tmp" "${TR_vol}" "${FWHM}"
+ bash Tools/BIDS/CreateCompleteCifti.sh "${AnatFolder}" "${OutFolder}" "${Subject}" "${Ses}" "${TR_vol}" "${FWHM}"
 fi
-
-
-rm -r "${Work_dir}"/"${Subject}"/tmp
-
-goodvoxels
