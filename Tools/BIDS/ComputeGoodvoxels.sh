@@ -7,14 +7,14 @@
 ### 	- OutFolder: Directory where the output files are to be stored
 ###	    - NeighborhoodSmoothing: Sigma of the kernel for smoothing the cov image
 
-
-fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
-OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp
 fmriFolder=$1
 OutFolder=$2
 Subject=$3
 Ses=$4
 NeighborhoodSmoothing=$5
+
+fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
+OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
 # Check data:
 echo "fmriFolder:" "${fmriFolder}"
