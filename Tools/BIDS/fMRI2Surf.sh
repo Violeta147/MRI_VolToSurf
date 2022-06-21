@@ -8,16 +8,16 @@
 ### Optional flags and their input arguments are:
 ###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask)
 
-
-AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
-fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
-OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp
 AnatFolder=$1
 fmriFolder=$2
 OutFolder=$3
 Subject=$4
 Ses=$5
 hemi=$6
+
+AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
+fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
+OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
 # Check data:
 echo "AnatFolder:" "${AnatFolder}"
