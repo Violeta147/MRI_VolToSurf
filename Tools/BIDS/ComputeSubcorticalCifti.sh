@@ -9,14 +9,15 @@
 ###	-s --subcortical-mask <subc> : Full path to subcortical mask in native anatomical space
 ###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask) are stored
 
-AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
-fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
-OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp
 AnatFolder=$1
 fmriFolder=$2
 OutFolder=$3
 Subject=$4
 Ses=$5
+
+AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
+fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
+OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
 # Check data:
 echo "AnatFolder:" "${AnatFolder}"
@@ -81,7 +82,7 @@ else
  fi
 fi
 
-
+: '
 if ! [ -f "${Subc}" ]; then
   
  echo "Creating subcortical mask"
@@ -92,6 +93,7 @@ if ! [ -f "${Subc}" ]; then
  fi
 
 fi
+'
 
 
 # Register Subcortical mask to fMRI space
@@ -103,11 +105,11 @@ fslmaths "${Subc}" -thr 7 -uthr 7 -bin "${OutFolder}"/"${Subject}"_"${Ses}"_subc
 flirt -in "${OutFolder}"/"${Subject}"_"${Ses}"_subcortical_mask.nii.gz -ref "${OutFolder}"/"${Subject}"_"${Ses}"_mean.nii.gz -applyxfm -init "${OutFolder}"/"${Subject}"_"${Ses}"_from-T2w_to-bold_mode-image.mat -interp nearestneighbour -o "${OutFolder}"/"${Subject}"_"${Ses}"_subc_fmri.nii.gz
 
 # Create subcortical-structures.txt file
-printf "%s\n" OTHER >> "${OutFolder}"/subcortical-structures.txt
-printf "%s\n" "1 255 0 0 255" >> "${OutFolder}"/subcortical-structures.txt
+printf "%s\n" OTHER >> "${OutFolder}"/"${Subject}"_"${Ses}"_subcortical-structures.txt
+printf "%s\n" "1 255 0 0 255" >> "${OutFolder}"/"${Subject}"_"${Ses}"_subcortical-structures.txt
 
 # Create Label file
-wb_command -volume-label-import "${OutFolder}"/"${Subject}"_"${Ses}"_subc_fmri.nii.gz "${OutFolder}"/subcortical-structures.txt "${OutFolder}"/"${Subject}"_"${Ses}"_subc_fmri.nii.gz -discard-others -drop-unused-labels
+wb_command -volume-label-import "${OutFolder}"/"${Subject}"_"${Ses}"_subc_fmri.nii.gz "${OutFolder}"/"${Subject}"_"${Ses}"_subcortical-structures.txt "${OutFolder}"/"${Subject}"_"${Ses}"_subc_fmri.nii.gz -discard-others -drop-unused-labels
 
 
 if [[ $(echo 3 == 3 | bc -l | cut -f1 -d.) == "1" ]]
