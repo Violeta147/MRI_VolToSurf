@@ -9,8 +9,7 @@
 ###	- GreyRibbonValue: The value of the grey ribbon voxels in the output image
 
 
-AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
-OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"/tmp
+
 AnatFolder=$1
 OutFolder=$2
 Subject=$3
@@ -18,6 +17,9 @@ Ses=$4
 RefImg=$5
 hemi=$6
 GreyRibbonValue=$7
+
+AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
+OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
 # Check data:
 echo "AnatFolder:" "${AnatFolder}"
