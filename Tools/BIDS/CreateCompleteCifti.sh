@@ -8,34 +8,6 @@
 ###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask)
 
 
-normalize=0
-
-PARAMS=""
-while (( "$#" )) ; do
-  case "$1" in
-    -n|--normalize)
-      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
-	normalize=1
-        Temp_dir=$2
-        shift 2
-      else
-        echo "Error: Argument for $1 is missing" >&2
-        exit 1
-      fi
-      ;;
-    -*|--*=) # unsupported flags
-      echo "Error: Unsupported flag $1" >&2
-      exit 1
-      ;;
-    *) # preserve positional arguments
-      PARAMS="$PARAMS $1"
-      shift
-      ;;
-  esac
-done
-
-eval set -- "$PARAMS"
-
 AnatFolder=$1
 OutFolder=$2
 Subject=$3
@@ -48,6 +20,7 @@ OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
 echo "AnatFolder:" "${AnatFolder}"
 echo "OutFolder:" "${OutFolder}"
+
 
 wb_command -cifti-create-dense-timeseries \
 	"${OutFolder}"/"${Subject}"_"${Ses}"_Grayordinates.dtseries.nii \
