@@ -7,7 +7,6 @@
 ### Optional flags and their input arguments are:
 ###	-n --normalize <Temp_dir> : Full path to the directory where the template files (anatomical image and subcortical mask)
 
-
 AnatFolder=$1
 OutFolder=$2
 Subject=$3
@@ -17,10 +16,6 @@ FWHM=$6
 
 AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
 OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
-
-echo "AnatFolder:" "${AnatFolder}"
-echo "OutFolder:" "${OutFolder}"
-
 
 wb_command -cifti-create-dense-timeseries \
 	"${OutFolder}"/"${Subject}"_"${Ses}"_Grayordinates.dtseries.nii \
