@@ -110,7 +110,7 @@ echo "OutDir:" "${OutDir}"
 
 # Compute mean fMRI
 echo " "
-echo "-------------------- MEAN fMRI --------------------"
+echo "------------------------------ MEAN fMRI ------------------------------"
 
 if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_mean.nii.gz ]; then
  echo "Computing mean fMRI"
@@ -148,7 +148,7 @@ echo "RefImg:" "${RefImg}"
 # Check if anat2func transformation matrix exist or compute it otherwise
 
 echo " "
-echo "-------------------- CHECK TRANSFORMATION MATRIX --------------------"
+echo "--------------------- CHECK TRANSFORMATION MATRIX ---------------------"
 
 if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_from-T2w_to-bold_mode-image.mat ] ; then
  echo "Computing transformation matrix"
@@ -187,7 +187,7 @@ RightGreyRibbonValue="1"
 ### CREATE RIBBON ###
 
 echo " "
-echo "-------------------- RIBBON IMAGE --------------------"
+echo "---------------------------- RIBBON IMAGE -----------------------------"
 
 if ! [ -f  "${OutDir}"/"${Subject}"_"${Ses}"_ribbon_only.nii.gz ]; then
  echo "Computing Ribbon Image (from file ComputeRibbon.sh)"
@@ -230,7 +230,7 @@ fi
 # Create mask of voxels with good signal
 
 echo " "
-echo "-------------------- MASK OF GOOD VOXELS --------------------"
+echo "------------------------- MASK OF GOOD VOXELS -------------------------"
 
 if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_goodvoxels.nii.gz ]; then
  echo "Computing Goodvoxels Image (from file ComputeGoodvoxels.sh)"
@@ -275,7 +275,7 @@ done
 ### SURFACE SMOOTHING
 
 echo " "
-echo "-------------------- SURFACE SMOOTHING --------------------"
+echo "------------------------- SURFACE SMOOTHING ---------------------------"
 
 if ! [ -f "${OutDir}"/"${Subject}"_"${Ses}"_preproc_rest_s"${FWHM}".atlasroi."${hemi}".native.func.gii ]; then
  echo "Smoothing fMRI cortical surface"
@@ -297,7 +297,7 @@ fi
 ### SUBCORTICAL PROCESSING
 
 echo " "
-echo "-------------------- SUBCORTICAL PROCESSING --------------------"
+echo "----------------------- SUBCORTICAL PROCESSING ------------------------"
 
 if [ ${normalize} -eq 1 ]; then
 
@@ -346,7 +346,7 @@ fi
 ### CREATE DENSE TIMESERIES
 
 echo " "
-echo "-------------------- CREATE DENSE TIMESERIES --------------------"
+echo "---------------------- CREATE DENSE TIMESERIES ------------------------"
 echo "Creating Complete Cifti (from file CreateCompleteCifti.sh)"
 
 TR_vol=$(fslval "${Work_dir}"/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func/"${Subject}"_"${Ses}"_task-rest_desc-preproc_bold.nii.gz pixdim4 | cut -d " " -f 1)
