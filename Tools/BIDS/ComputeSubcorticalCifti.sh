@@ -19,11 +19,6 @@ AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/ana
 fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
 OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
-# Check data:
-echo "AnatFolder:" "${AnatFolder}"
-echo "fmriFolder:" "${fmriFolder}"
-echo "OutFolder:" "${OutFolder}"
-
 useFreesurfer=0
 
 PARAMS=""
