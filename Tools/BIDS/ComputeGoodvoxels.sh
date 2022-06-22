@@ -16,11 +16,6 @@ NeighborhoodSmoothing=$5
 fmriFolder=/media/BabyBrain/preterm/rel3_dhcp_fmri_pipeline/"${Subject}"/"${Ses}"/func
 OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
-# Check data:
-echo "fmriFolder:" "${fmriFolder}"
-echo "OutFolder:" "${OutFolder}"
-echo "NeighborhoodSmoothing:" "${NeighborhoodSmoothing}"
-
 # Compute standard deviation and cov (mean/std ratio) volumes
 fslmaths "${fmriFolder}"/"${Subject}"_"${Ses}"_task-rest_desc-preproc_bold.nii.gz -Tstd "${OutFolder}"/"${Subject}"_"${Ses}"_std.nii.gz -odt float
 fslmaths "${OutFolder}"/"${Subject}"_"${Ses}"_std.nii.gz -div "${OutFolder}"/"${Subject}"_"${Ses}"_mean.nii.gz "${OutFolder}"/"${Subject}"_"${Ses}"_cov.nii.gz
@@ -36,13 +31,13 @@ fslmaths "${OutFolder}"/"${Subject}"_"${Ses}"_cov_norm_modulate -mas "${OutFolde
 
 # Print stats
 STD=$(fslstats "${OutFolder}"/"${Subject}"_"${Ses}"_cov_norm_modulate_ribbon.nii.gz -S)
-echo "$STD"
+echo "std:" "$STD"
 MEAN=$(fslstats "${OutFolder}"/"${Subject}"_"${Ses}"_cov_norm_modulate_ribbon.nii.gz -M)
-echo "$MEAN"
+echo "mean:" "$MEAN"
 Lower=$(echo "$MEAN - ($STD * 0.5)" | bc -l)
-echo "$Lower"
+echo "Lower:" "$Lower"
 Upper=$(echo "$MEAN + ($STD * 0.5)" | bc -l)
-echo "$Upper"
+echo "Upper:" "$Upper"
 
 fslmaths "${OutFolder}"/"${Subject}"_"${Ses}"_mean.nii.gz -bin "${OutFolder}"/"${Subject}"_"${Ses}"_mask.nii.gz
 fslmaths "${OutFolder}"/"${Subject}"_"${Ses}"_cov_norm_modulate.nii.gz -thr "$Upper" -bin -sub "${OutFolder}"/"${Subject}"_"${Ses}"_mask.nii.gz -mul -1 "${OutFolder}"/"${Subject}"_"${Ses}"_goodvoxels.nii.gz
