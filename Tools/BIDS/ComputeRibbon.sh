@@ -21,12 +21,6 @@ GreyRibbonValue=$7
 AnatFolder=/media/BabyBrain/preterm/dhcp_anat_pipeline/"${Subject}"/"${Ses}"/anat
 OutFolder=/media/BabyBrain/preterm/fMRI_Vol2Cifti/"${Subject}"_"${Ses}"
 
-# Check data:
-echo "AnatFolder:" "${AnatFolder}"
-echo "OutFolder:" "${OutFolder}"
-echo "RefImg:" "${RefImg}"
-echo "GreyRibbonValue:" "${GreyRibbonValue}"
-
 # Compute shortest distance from each voxel to surfaces
 wb_command -create-signed-distance-volume "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_wm.surf.gii "${RefImg}" "${OutFolder}"/"${Subject}"_"${Ses}"_"${hemi}".white.native.nii.gz
 wb_command -create-signed-distance-volume "${AnatFolder}"/"${Subject}"_"${Ses}"_hemi-"${hemi}"_space-T2w_pial.surf.gii "${RefImg}" "${OutFolder}"/"${Subject}"_"${Ses}"_"${hemi}".pial.native.nii.gz
