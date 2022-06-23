@@ -92,8 +92,8 @@ cd /home/vsanchez/Documents/MRI_VolToSurf/ || exit
 # Create temporal folder (in Preterm)
 
 : '
-Subject=sub-CC00124XX09
-Ses=ses-42302
+Subject=sub-CC00063AN06
+Ses=ses-15102
 Work_dir=/media/BabyBrain/preterm
 FWHM="6"
 
@@ -217,7 +217,7 @@ if ! [ -f  "${OutDir}"/"${Subject}"_"${Ses}"_ribbon_only.nii.gz ]; then
 
  # Merge Ribbon Hemispheres
  fslmaths "${OutDir}"/"${Subject}"_"${Ses}"_L.ribbon.nii.gz -add "${OutDir}"/"${Subject}"_"${Ses}"_R.ribbon.nii.gz "${OutDir}"/"${Subject}"_"${Ses}"_ribbon_only.nii.gz
- #rm "${OutDir}"/"${Subject}"_"${Ses}"_L.ribbon.nii.gz "${OutDir}"/"${Subject}"_"${Ses}"_R.ribbon.nii.gz
+ rm "${OutDir}"/"${Subject}"_"${Ses}"_L.ribbon.nii.gz "${OutDir}"/"${Subject}"_"${Ses}"_R.ribbon.nii.gz
 
 else
 
